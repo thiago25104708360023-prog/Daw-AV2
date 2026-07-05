@@ -2,10 +2,8 @@
 session_start();
 require_once 'config.php';
 
-// Define que toda saída deste arquivo vai ser no formato JSON
 header('Content-Type: application/json');
 
-// Captura payloads em JSON enviados por um POST
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
 $action = $_GET['action'] ?? '';
 
@@ -13,7 +11,6 @@ $db = getDBConnection();
 
 switch ($action) {
     case 'check-auth':
-        // Verifica se a sessão do usuário tá ativa no servidor
         if (isset($_SESSION['user_id'])) {
             echo json_encode([
                 'authenticated' => true, 
@@ -42,7 +39,6 @@ switch ($action) {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Grava login em sessão
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_email'] = $user['email'];
@@ -66,7 +62,6 @@ switch ($action) {
         break;
 
     case 'get-services':
-        // Busca a árvore completa de categorias com seus respectivos serviços vinculados
         $categoriesQuery = $db->query("SELECT * FROM categories ORDER BY id ASC");
         $categories = $categoriesQuery->fetchAll();
 
@@ -101,8 +96,7 @@ switch ($action) {
             $stmt = $db->prepare("INSERT INTO appointments (user_id, total_price) VALUES (?, ?)");
             $stmt->execute([$_SESSION['user_id'], $totalPrice]);
             $appointmentId = $db->lastInsertId();
-
-            // Insere cada item individualizado com data e hora selecionados nos popups
+ 
             $itemStmt = $db->prepare("INSERT INTO appointment_items (appointment_id, service_id, booking_date, booking_time, price) VALUES (?, ?, ?, ?, ?)");
             foreach ($cart as $item) {
                 $itemStmt->execute([
