@@ -25,9 +25,10 @@ switch ($action) {
         }
         break;
 
-   case 'login':
-    $email = isset($_POST['email']) ? $_POST['email'] : 'cliente@teste.com';
-    $name = isset($_POST['name']) ? $_POST['name'] : 'Cliente Conectado';
+  case 'login':
+    if (ob_get_length()) ob_clean();
+    
+    header('Content-Type: application/json; charset=utf-8');
 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -36,10 +37,13 @@ switch ($action) {
     $_SESSION['usuario'] = [
         'id' => 1,
         'name' => 'Cliente Teste',
-        'email' => $email
+        'email' => isset($_POST['email']) ? $_POST['email'] : 'teste@lumine.com'
     ];
 
-    echo json_encode(['status' => 'success', 'message' => 'Login simulado com sucesso']);
+    echo json_encode([
+        'status' => 'success', 
+        'message' => 'Login efetuado com sucesso'
+    ]);
     exit;
 break;
 
