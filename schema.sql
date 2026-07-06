@@ -71,8 +71,3 @@ INSERT INTO services (category_id, name, price) VALUES
 (4, 'Hidratação Capilar', 60.00),
 (4, 'Nutrição Capilar', 100.00),
 (4, 'Limpeza De Pele', 120.00);
-
--- Criação de um usuário padrão pra testar o sistema (Senha: 123456)
-INSERT INTO users (name, email, password) VALUES 
-('Cliente Teste', 'luminebeautyofc@gmail.com', '$2y$10$7R93Wf7eLwYh0GvT.5pfeOX2Wq7v1O1t67R3M2/oV3pEq3.tD.YWW')
-ON DUPLICATE KEY UPDATE email=email;
