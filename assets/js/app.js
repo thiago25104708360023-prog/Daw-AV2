@@ -184,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ENGENHARIA DO FLUXO DOS POPUPS SEQUENCIAIS DO CARRINHO
     function openServicesSelectionPopup(categoryId) {
         const category = appState.servicesData.find(c => c.id === categoryId);
         if (!category) return;
@@ -216,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dayStr = newDay.getAttribute('data-day');
                 appState.currentSelectedService.date = `2026-06-${dayStr}`;
                 closeModal('modal-calendar');
-                openHoursPopup(); // Próximo passo
+                openHoursPopup();
             });
         });
     }
@@ -250,12 +249,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let totalSum = 0;
         appState.cart.forEach((item) => {
-            totalSum += parseFloat(item.price);
+            const itemPrice = parseFloat(item.price);
+            totalSum += itemPrice;
             const formattedDate = item.date.split('-')[2] + '/06';
             const record = document.createElement('div');
             record.className = 'cart-item-record';
             record.innerHTML = `
-                <div class="title-row"><span>${item.name}</span><span>R$ ${item.price.toFixed(2).replace('.', ',')}</span></div>
+                <div class="title-row"><span>${item.name}</span><span>R$ ${itemPrice.toFixed(2).replace('.', ',')}</span></div>
                 <div class="meta-row">Agendado para: ${formattedDate} às ${item.time}</div>
             `;
             scrollBox.appendChild(record);
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function executeDatabaseBookingTransaction() {
         let totalSum = 0;
-        appState.cart.forEach(i => totalSum += i.price);
+        appState.cart.forEach(i => totalSum += parseFloat(i.price));
 
         fetch('api.php?action=save-appointment', {
             method: 'POST',
