@@ -25,36 +25,23 @@ switch ($action) {
         }
         break;
 
-    case 'login':
-        $email = trim($data['email'] ?? '');
-        $password = trim($data['password'] ?? '');
+   case 'login':
+    $email = isset($_POST['email']) ? $_POST['email'] : 'cliente@teste.com';
+    $name = isset($_POST['name']) ? $_POST['name'] : 'Cliente Conectado';
 
-        if (empty($email) || empty($password)) {
-            echo json_encode(['success' => false, 'error' => 'Por favor, preencha todos os campos.']);
-            break;
-        }
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    $_SESSION['usuario'] = [
+        'id' => 1,
+        'name' => 'Cliente Teste',
+        'email' => $email
+    ];
 
-        $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
-
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_email'] = $user['email'];
-
-            echo json_encode([
-                'success' => true, 
-                'user' => [
-                    'id' => $user['id'],
-                    'name' => $user['name'],
-                    'email' => $user['email']
-                ]
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'E-mail ou senha incorretos.']);
-        }
-        break;
+    echo json_encode(['status' => 'success', 'message' => 'Login simulado com sucesso']);
+    exit;
+break;
 
     case 'logout':
         session_destroy();
