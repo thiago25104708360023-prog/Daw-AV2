@@ -26,26 +26,27 @@ switch ($action) {
         break;
 
   case 'login':
-    if (ob_get_length()) ob_clean();
+        $email = $data['email'] ?? '';
     
-    header('Content-Type: application/json; charset=utf-8');
-
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    
-    $_SESSION['usuario'] = [
-        'id' => 1,
-        'name' => 'Cliente Teste',
-        'email' => isset($_POST['email']) ? $_POST['email'] : 'teste@lumine.com'
-    ];
-
-    echo json_encode([
-        'status' => 'success', 
-        'message' => 'Login efetuado com sucesso'
-    ]);
-    exit;
-break;
+        if (!preg_match('/^\S+@\S+$/', $email)) {
+            echo json_encode(['success' => false, 'error' => 'E-mail inválido.']);
+            break;
+        }
+ 
+        $_SESSION['user_id'] = 1;
+        $_SESSION['user_name'] = 'Cliente Teste';
+        $_SESSION['user_email'] = $email;
+ 
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login efetuado com sucesso',
+            'user' => [
+                'id' => $_SESSION['user_id'],
+                'name' => $_SESSION['user_name'],
+                'email' => $_SESSION['user_email']
+            ]
+        ]);
+        break;
 
     case 'logout':
         session_destroy();
