@@ -73,6 +73,8 @@ INSERT INTO services (category_id, name, price) VALUES
 (4, 'Limpeza De Pele', 120.00);
 
 
+-- Inserção dos usuários base para teste
 INSERT INTO users (name, email, password) VALUES 
-('Cliente Teste', 'luminebeautyofc@gmail.com', '$2y$10$7R93Wf7eLwYh0GvT.5pfeOX2Wq7v1O1t67R3M2/oV3pEq3.tD.YWW')
+('Lumine Contato', 'luminebeautyofc@gmail.com', '$2y$10$7R93Wf7eLwYh0GvT.5pfeOX2Wq7v1O1t67R3M2/oV3pEq3.tD.YWW'),
+('Cliente', 'cliente123@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
 ON DUPLICATE KEY UPDATE email=email;
