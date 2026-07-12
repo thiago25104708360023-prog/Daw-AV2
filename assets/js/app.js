@@ -1,5 +1,31 @@
+// Lista de arquivos que compõem cada tela (view) e cada popup (modal) do site.
+// Cada um vive isolado em /views/*.html ou /modals/*.html.
+const VIEW_FILES = ['inicio', 'sobre', 'login', 'cadastro', 'servicos', 'carrinho', 'pagamento'];
+const MODAL_FILES = ['modal-services', 'modal-calendar', 'modal-hours', 'modal-clear-confirm', 'modal-confirmacao'];
+
 document.addEventListener("DOMContentLoaded", () => {
-    
+    loadPartials();
+});
+
+async function loadPartials() {
+    const viewContainer = document.getElementById('view-container');
+    const modalsContainer = document.getElementById('modals-container');
+
+    const viewHtmls = await Promise.all(
+        VIEW_FILES.map(name => fetch(`views/${name}.html`).then(res => res.text()))
+    );
+    viewHtmls.forEach(html => viewContainer.insertAdjacentHTML('beforeend', html));
+
+    const modalHtmls = await Promise.all(
+        MODAL_FILES.map(name => fetch(`modals/${name}.html`).then(res => res.text()))
+    );
+    modalHtmls.forEach(html => modalsContainer.insertAdjacentHTML('beforeend', html));
+
+    initApp();
+}
+
+function initApp() {
+
     let appState = {
         isAuthenticated: false,
         user: null,
@@ -12,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         'inicio': document.getElementById('view-inicio'),
         'sobre': document.getElementById('view-sobre'),
         'login': document.getElementById('view-login'),
+        'cadastro': document.getElementById('view-cadastro'),
         'servicos': document.getElementById('view-servicos'),
         'carrinho': document.getElementById('view-carrinho'),
         'pagamento': document.getElementById('view-pagamento')
@@ -53,6 +80,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById('btn-submit-login').addEventListener('click', executeLogin);
+
+    document.getElementById('link-go-to-cadastro').addEventListener('click', (e) => {
+        e.preventDefault();
+        switchView('cadastro');
+    });
+    document.getElementById('link-go-to-login').addEventListener('click', (e) => {
+        e.preventDefault();
+        switchView('login');
+    });
+    document.getElementById('btn-cadastro-back').addEventListener('click', () => switchView('inicio'));
+    document.getElementById('btn-submit-cadastro').addEventListener('click', executeRegister);
+
+    document.getElementById('btn-confirmacao-voltar').addEventListener('click', () => {
+        closeModal('modal-confirmacao');
+        switchView('inicio');
+    });
 
     document.querySelectorAll('.cat-panel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -138,6 +181,37 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function executeRegister() {
+        const name = document.getElementById('cadastro-nome').value.trim();
+        const email = document.getElementById('cadastro-email').value.trim();
+        const password = document.getElementById('cadastro-senha').value;
+        const passwordConfirm = document.getElementById('cadastro-senha-confirma').value;
+        const errorBox = document.getElementById('cadastro-error-msg');
+        errorBox.classList.add('hidden');
+
+        if (password !== passwordConfirm) {
+            errorBox.textContent = 'As senhas não coincidem.';
+            errorBox.classList.remove('hidden');
+            return;
+        }
+
+        fetch('api.php?action=register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, email: email, password: password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                setSessionLoggedState(data.user);
+                switchView('inicio');
+            } else {
+                errorBox.textContent = data.error;
+                errorBox.classList.remove('hidden');
+            }
+        });
+    }
+
     function executeLogout() {
         fetch('api.php?action=logout')
             .then(res => res.json())
@@ -184,6 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ENGENHARIA DO FLUXO DOS POPUPS SEQUENCIAIS DO CARRINHO
     function openServicesSelectionPopup(categoryId) {
         const category = appState.servicesData.find(c => c.id === categoryId);
         if (!category) return;
@@ -215,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dayStr = newDay.getAttribute('data-day');
                 appState.currentSelectedService.date = `2026-06-${dayStr}`;
                 closeModal('modal-calendar');
-                openHoursPopup();
+                openHoursPopup(); // Próximo passo
             });
         });
     }
@@ -311,11 +386,13 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(response => {
             if (response.success) {
-                alert(response.message);
+                document.getElementById('confirmacao-mensagem').textContent = response.message;
+                document.getElementById('confirmacao-total').textContent = `Total pago: R$ ${totalSum.toFixed(2).replace('.', ',')}`;
+                document.getElementById('modal-confirmacao').classList.add('active');
+
                 appState.cart = [];
                 updateCartPanelUI();
                 document.getElementById('payment-contextual-area').classList.add('hidden');
-                switchView('inicio');
             } else {
                 alert('Erro: ' + response.error);
             }
@@ -325,4 +402,4 @@ document.addEventListener("DOMContentLoaded", () => {
     window.closeModal = function(id) {
         document.getElementById(id).classList.remove('active');
     };
-});
+}
