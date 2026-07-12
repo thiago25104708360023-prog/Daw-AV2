@@ -1,0 +1,21 @@
+        <section id="view-login" class="view">
+            <div class="login-card">
+                <h2>Login</h2>
+                <div id="login-error-msg" class="error-msg hidden"></div>
+                <form id="form-login" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="login-email">e-mail</label>
+                        <input type="email" id="login-email" placeholder="Digite o e-mail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">senha</label>
+                        <input type="password" id="login-password" placeholder="Digite a senha" required>
+                    </div>
+                    <div class="login-actions">
+                        <button type="submit" id="btn-submit-login" class="btn-orange-filled">Login</button>
+                        <button type="button" id="btn-login-back" class="btn-orange-outline">Voltar</button>
+                    </div>
+                    <p class="switch-form-text">Não tem conta? <a href="#" id="link-go-to-cadastro">Cadastre-se</a></p>
+                </form>
+            </div>
+        </section>
