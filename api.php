@@ -25,18 +25,31 @@ switch ($action) {
         }
         break;
 
-  case 'login':
-        $email = $data['email'] ?? '';
-    
+    case 'login':
+        $email = trim($data['email'] ?? '');
+        $password = $data['password'] ?? '';
+
+        // Validação simples: precisa ter algo antes do @ e algo depois do @
         if (!preg_match('/^\S+@\S+$/', $email)) {
             echo json_encode(['success' => false, 'error' => 'E-mail inválido.']);
             break;
         }
- 
-        $_SESSION['user_id'] = 1;
-        $_SESSION['user_name'] = 'Cliente Teste';
-        $_SESSION['user_email'] = $email;
- 
+
+        // Busca o usuário pelo e-mail
+        $stmt = $db->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        // password_verify compara a senha digitada com o hash salvo no banco
+        if (!$user || !password_verify($password, $user['password'])) {
+            echo json_encode(['success' => false, 'error' => 'E-mail ou senha incorretos.']);
+            break;
+        }
+
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_email'] = $user['email'];
+
         echo json_encode([
             'success' => true,
             'message' => 'Login efetuado com sucesso',
@@ -44,6 +57,44 @@ switch ($action) {
                 'id' => $_SESSION['user_id'],
                 'name' => $_SESSION['user_name'],
                 'email' => $_SESSION['user_email']
+            ]
+        ]);
+        break;
+
+    case 'register':
+        $name = trim($data['name'] ?? '');
+        $email = trim($data['email'] ?? '');
+        $password = $data['password'] ?? '';
+
+        if ($name === '' || !preg_match('/^\S+@\S+$/', $email) || strlen($password) < 6) {
+            echo json_encode(['success' => false, 'error' => 'Preencha nome, e-mail válido e senha com pelo menos 6 caracteres.']);
+            break;
+        }
+
+        // Confere se já existe alguém com esse e-mail (a coluna também é UNIQUE no banco)
+        $checkStmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+        $checkStmt->execute([$email]);
+        if ($checkStmt->fetch()) {
+            echo json_encode(['success' => false, 'error' => 'Este e-mail já está cadastrado.']);
+            break;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+        $insertStmt = $db->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+        $insertStmt->execute([$name, $email, $hashedPassword]);
+
+        $_SESSION['user_id'] = $db->lastInsertId();
+        $_SESSION['user_name'] = $name;
+        $_SESSION['user_email'] = $email;
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Conta criada com sucesso!',
+            'user' => [
+                'id' => $_SESSION['user_id'],
+                'name' => $name,
+                'email' => $email
             ]
         ]);
         break;
