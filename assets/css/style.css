@@ -237,6 +237,16 @@ body {
 .hour-slot-btn { padding: 10px; background-color: white; border: 1px solid #CCC; font-weight: bold; cursor: pointer; }
 .dialog-actions { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
 
+.switch-form-text { text-align: center; font-size: 13px; margin-top: 14px; color: #555; }
+.switch-form-text a { color: #FF7A00; font-weight: bold; text-decoration: none; }
+.switch-form-text a:hover { text-decoration: underline; }
+
+.confirmacao-box { align-items: center; text-align: center; width: 300px; gap: 10px; }
+.confirmacao-icon { width: 56px; height: 56px; border-radius: 50%; background-color: #00BFA5; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px auto; }
+.confirmacao-texto { font-size: 13px; color: #555; }
+.confirmacao-total-value { font-size: 16px; font-weight: bold; color: #FF7A00; }
+.confirmacao-box .btn-orange-filled { margin-top: 10px; }
+
 .main-footer { background-color: #FFFFFF; border-top: 1px solid #EAEAEA; padding: 30px 20px; margin-top: auto; }
 .footer-top-row { max-width: 1200px; margin: 0 auto 25px auto; display: flex; gap: 40px; border-bottom: 1px solid #EEE; padding-bottom: 15px; }
 .contact-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #FF7A00; font-weight: 500; }
